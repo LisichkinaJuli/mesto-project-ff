@@ -38,8 +38,8 @@ initialCards.forEach((item) => {
 // ПРОФИЛЬ
 // Функция открытия диалогового окна профиля
 buttonProfileEdit.addEventListener('click',() => {
-   nameInput.value = profileTitle.textContent;
-   jobInput.value = profileDesc.textContent;
+    nameInput.value = profileTitle.textContent;
+    jobInput.value = profileDesc.textContent;
     openPopup(popupEdit);
 });
 //Редактирования профиля

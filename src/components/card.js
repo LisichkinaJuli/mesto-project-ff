@@ -1,6 +1,7 @@
+const cardTemplate = document.querySelector('#card-template');
+
 export const createCard = function(item, handleLikeClick, handleDeleteCard, handleClickOpenImage) {
-    const cardTemplate = document.querySelector('#card-template');
-    const cardItem = cardTemplate.content.cloneNode(true).querySelector('.places__item');
+    const cardItem = getCardTemplate();  
     const cartImg = cardItem.querySelector('.card__image');
     const cardName = cardItem.querySelector('.card__title');
     const cardLikeButton = cardItem.querySelector('.card__like-button');
@@ -17,10 +18,13 @@ export const createCard = function(item, handleLikeClick, handleDeleteCard, hand
     cardDeleteButton.addEventListener('click', handleDeleteCard);
     return cardItem;
 };
+export const getCardTemplate = () => {
+    return cardTemplate.content.cloneNode(true).querySelector('.places__item');
+};
 export const handleLikeClick = (evt) => {
     evt.target.classList.toggle('card__like-button_is-active');
 };
 export const handleDeleteCard = (evt) => {
-   let card = evt.target.closest('.places__item');
+   const card = evt.target.closest('.places__item');
    card.remove();
 };
