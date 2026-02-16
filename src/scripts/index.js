@@ -15,6 +15,7 @@ const popupEdit = document.querySelector('.popup_type_edit');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupNewAvatar = document.querySelector('.popup_type_new-avatar');
 const popupDeleteCard = document.querySelector('.popup_type_delete-card');
+const saveButton = popupDeleteCard.querySelector('.popup__button');
 // Кнопки
 const buttonProfileEdit = document.querySelector('.profile__edit-button');
 const buttonNewCard = document.querySelector('.profile__add-button');
@@ -55,17 +56,17 @@ function handleFormProfileSubmit(evt) {
     const name = nameInput.value;
     const about = jobInput.value;
     updateUserInfo(name, about)
-    .then(() => {
-        profileTitle.textContent = name;
-        profileDesc.textContent = about;
-        formElementProfile.reset();
-        clearValidation(formElementProfile, validationConfig);
-        closePopup(popupEdit);
-    })
-    .catch(err => console.log(err))
-    .finally(() => {
-        saveButton.textContent = 'Сохранить'; // Вернется в исходное состояние всегда
-    });
+        .then(() => {
+            profileTitle.textContent = name;
+            profileDesc.textContent = about;
+            formElementProfile.reset();
+            clearValidation(formElementProfile, validationConfig);
+            closePopup(popupEdit);
+        })
+        .catch(err => console.log(err))
+        .finally(() => {
+            saveButton.textContent = 'Сохранить'; // Вернется в исходное состояние всегда
+        });
 };
 
 // НОВОЕ МЕСТО
@@ -85,39 +86,48 @@ function handleFormsPlaceSubmit(evt) {
         link: placeLink.value
     };
     addNewCard(item)
-    .then((item) => {
-        const card = createCard(item, handleLikeClick, handleDeleteCard, handleClickOpenImage, item.owner['_id']);
-        cardList.prepend(card);
-        formElementPlace.reset();
-        clearValidation(formElementPlace, validationConfig);
-        closePopup(popupNewCard);
-    })
-    .catch(err => console.log(err))
-    .finally(() => {
-        saveButton.textContent = 'Сохранить'; // Вернется в исходное состояние всегда
-    });
+        .then((item) => {
+            const card = createCard(item, handleLikeClick, handleDeleteCard, handleClickOpenImage, item.owner['_id']);
+            cardList.prepend(card);
+            formElementPlace.reset();
+            clearValidation(formElementPlace, validationConfig);
+            closePopup(popupNewCard);
+        })
+        .catch(err => console.log(err))
+        .finally(() => {
+            saveButton.textContent = 'Сохранить'; // Вернется в исходное состояние всегда
+        });
 };
 // Функция удаления карточки нового места
+// Объект для хранения данных карточки, которую собираемся удалить
+let cardToDelete = {};
+// Глобальный обработчик сабмита (добавляется один раз при инициализации скрипта)
+formDelete.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    // Вызываем функцию удаления, передавая сохраненные данные
+    handleFormsDeleteCardSubmit(evt, cardToDelete.element, cardToDelete.id);
+});
 function handleDeleteCard(evt, cardId) {
     openPopup(popupDeleteCard);
-    const card = evt.target.closest('.places__item');
-    formDelete.addEventListener('submit', (evt) => handleFormsDeleteCardSubmit(evt, card, cardId));
+    // Сохраняем ссылку на элемент и его id в глобальный объект
+    cardToDelete.element = evt.target.closest('.places__item');
+    cardToDelete.id = cardId;
 }
-function handleFormsDeleteCardSubmit(evt, card, cardId) {
-    evt.preventDefault();
-    const saveButton = popupDeleteCard.querySelector('.popup__button');
+function handleFormsDeleteCardSubmit(evt, cardElement, cardId) {
+    evt.preventDefault();    
     saveButton.textContent = 'Удаление ...'
     deleteCard(cardId)
-    .then(() => {
-        closePopup(popupDeleteCard);
-        card.remove();
-    })
-    .catch(err => console.log(err))
-    .finally(() => {
-        saveButton.textContent = 'Да'  // Вернется в исходное состояние всегда
-    });
+        .then(() => {
+            closePopup(popupDeleteCard);
+            cardElement.remove();
+        })
+        .catch(err => console.log(err))
+        .finally(() => {
+            saveButton.textContent = 'Да'  // Вернется в исходное состояние всегда
+            // После успешного удаления можно очистить объект: 
+            cardToDelete = {};
+        });
 }
-
 
 // ИЗМЕНЕНИЕ АВАТАРА
 // Функция открытия диалогового окна изменения аватара
@@ -132,16 +142,16 @@ function handleFormsAvatarSubmit(evt) {
     const saveButton = popupNewAvatar.querySelector('.popup__button');
     saveButton.textContent = 'Сохранение...';
     updateAvatar(avatarLink.value)
-    .then(() => {
-        profileUserImage.setAttribute('style', `background-image: url('${avatarLink.value}')`);
-        formElementAvatar.reset();
-        clearValidation(formElementAvatar, validationConfig);
-        closePopup(popupNewAvatar);
-    })
-    .catch(err => console.log(err))
-    .finally(() => {
-        saveButton.textContent = 'Сохранить'; // Вернется в исходное состояние всегда
-    });
+        .then(() => {
+            profileUserImage.setAttribute('style', `background-image: url('${avatarLink.value}')`);
+            formElementAvatar.reset();
+            clearValidation(formElementAvatar, validationConfig);
+            closePopup(popupNewAvatar);
+        })
+        .catch(err => console.log(err))
+        .finally(() => {
+            saveButton.textContent = 'Сохранить'; // Вернется в исходное состояние всегда
+        });
 };
 
 // POPUP
@@ -191,7 +201,7 @@ const renderCards = (cards, userId) => {
 
 // Получение информации о пользователе и карточках
 Promise.all([getUserInfo(), getCards()])
-.then(([user, cardsInfo]) => {
-    setUserInfo(user);
-    renderCards(cardsInfo, user._id);
-});
+    .then(([user, cardsInfo]) => {
+        setUserInfo(user);
+        renderCards(cardsInfo, user._id);
+    });
