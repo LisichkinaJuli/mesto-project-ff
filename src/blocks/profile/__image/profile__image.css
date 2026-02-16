@@ -7,7 +7,27 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
-  background-image: url("../../../images/avatar.jpg");
+}
+.profile__image:hover{
+  cursor: pointer;
+}
+/* Затемняющий слой */
+.profile__image::after {
+  content: '';
+  position: absolute;
+  width:120px;
+  height:120px;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  background-image: url('/src/images/edit-icon-2.svg');
+  background-size: 26px 26px;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: opacity 0.3s ease;
+}
+/* Показываем всё при наведении */
+.profile__image:hover::after {
+  opacity: 1;
 }
 
 @media screen and (max-width: 740px) {
